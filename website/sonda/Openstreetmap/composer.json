@@ -1,0 +1,35 @@
+{
+    "authors": [
+        {"name": "Ken Guest", "email": "ken@linux.ie", "role": "Lead"}
+    ],
+    "autoload":{
+        "classmap":["Services/"]
+    },
+    "autoload-dev": {
+        "classmap": [ "tests" ]
+    },
+    "description": "More information available at https://pear.php.net/package/Services_OpenStreetMap",
+    "homepage": "https://github.com/kenguest/Services_Openstreetmap",
+    "include-path": [
+        "./"
+    ],
+    "keywords": ["openstreetmap"],
+    "license": "BSD-3-Clause",
+    "name": "kenguest/services-openstreetmap",
+    "type": "library",
+    "require": {
+        "php": ">=5.3.0",
+        "pear/http_request2": "2.2.*",
+        "pear/log": "1.12.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "suggest": {
+        "pear/cache": "*"
+    },
+    "support": {
+        "issues": "https://pear.php.net/bugs/search.php?cmd=display&package_name[]=Services_OpenStreetMap",
+        "source": "https://github.com/kenguest/Services_Openstreetmap"
+    }
+}

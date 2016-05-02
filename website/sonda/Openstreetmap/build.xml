@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<!-- build xml -->
+
+<project name="services_openstreetmap" default="main">
+    <property name="builddir" value = "build"/>
+    <available file="${builddir}/docs" property="docs_exist" value="Y"/>
+    <available file="${builddir}/logs/pmd.xml" property="pmd_exist" value="Y"/>
+    <available file="${builddir}/logs/checkstyle.xml" property="phpcs_exist" value="Y"/>
+    <available file="${builddir}/coverage" property="coverage_exist" value="Y"/>
+    <available file="${builddir}/pdepend" property="pdepend_exist" value="Y"/>
+
+    <fileset dir="tests" id="tests" includes="**/*.php"/>
+    <fileset dir="Services" id="Services" includes="**/*.php"/>
+
+    <target name="main" depends="clean,lint,phpcs,phpmd,docs,test,phpcpd,phploc,phpdepend"/>
+
+    <target name="clean" depends="clean_phpunit,clean_pmd,clean_phpcs,clean_docs,clean_phploc,clean_phpcpd,clean_phpdepend" description="Clean out all files." />
+
+    <target name="clean_docs" if="docs_exist">
+        <delete dir="${builddir}/docs" includeemptydirs="yes"/>
+    </target>
+
+    <target name="clean_phpcpd">
+        <delete verbose="yes">
+        <fileset dir="${builddir}/logs">
+            <include name="pmd-cpd.csv"/>
+        </fileset>
+        </delete>
+    </target>
+
+    <target name="clean_phpcs" description="Clean PHPCS files." if="phpcs_exist">
+        <delete verbose="yes">
+            <fileset dir="${builddir}/logs">
+                <include name="**.*" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="clean_phpdepend" description="Clean phpdepend files" if="pdepend_exist">
+        <delete verbose="yes">
+            <fileset dir="${builddir}/logs">
+            <include name="jdepend.xml"/>
+            </fileset>
+        </delete>
+        <delete dir="${builddir}/pdepend" includeemptydirs="yes"/>
+    </target>
+
+    <target name="clean_phploc">
+        <delete verbose='yes'>
+        <fileset dir="${builddir}/logs">
+            <include name="phploc.csv"/>
+        </fileset>
+        </delete>
+    </target>
+
+    <target name="clean_phpunit" if="coverage_exist">
+        <delete verbose='yes'>
+            <fileset dir="${builddir}/coverage/">
+                <include name="coverage.xml"/>
+                <include name="coverage.db"/>
+            </fileset>
+        </delete>
+        <delete verbose='no' dir='${builddir}/coverage' includeemptydirs="yes"/>
+    </target>
+
+    <target name="clean_pmd" description="Clean Mess Detector file[s]." if="pmd_exist">
+        <delete verbose="yes">
+            <fileset dir="${builddir}/logs">
+            <include name="pmd.xml"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="delete_build" description="Delete build directory.">
+        <delete dir="${builddir}" includeemptydirs="yes"/>
+    </target>
+
+
+    <target name="docs" description="Generate Documentation" depends="clean_docs">
+        <mkdir dir="build/docs" />
+        <phpdoc2 title="Services_Openstreetmap" destdir="build/docs">
+            <fileset refid="Services"/>
+        </phpdoc2>
+    </target>
+
+    <target name="phpcpd" description="Generate pmd-cpd.xml using PHPCPD" depends="prepare">
+        <phpcpd>
+            <formatter type="pmd" outfile="${builddir}/logs/pmd-cpd.xml"/>
+            <fileset refid="Services"/>
+        </phpcpd>
+    </target>
+    <target name="phpcs" description="coding standards">
+        <phpcodesniffer format="checkstyle" standard="PEAR" haltonerror="yes"> 
+        <formatter type="checkstyle" outfile="${builddir}/logs/checkstyle.xml"/>
+            <fileset refid="Services"/>
+        </phpcodesniffer>
+    </target>
+
+
+    <target name="phpdepend" description="Calculate software metrics using PHP_Depend" depends="prepare">
+        <mkdir dir="${builddir}/pdepend" />
+        <phpdepend>
+            <logger type="jdepend-xml" outfile="${builddir}/logs/jdepend.xml" />
+            <logger type="jdepend-chart" outfile="${builddir}/pdepend/dependencies.svg" />
+            <logger type="overview-pyramid" outfile="${builddir}/pdepend/overview-pyramid.svg" />
+            <fileset refid="Services"/>
+            <fileset refid="tests"/>
+        </phpdepend>
+    </target>
+
+    <target name="phploc" description="Measure project size using PHPLOC" depends="prepare">
+        <phploc countTests="true" reportType="csv" reportName="phploc" reportDirectory="${builddir}/logs">
+            <fileset refid="Services"/>
+            <fileset refid="tests"/>
+        </phploc>
+    </target>
+
+
+    <target name="phpmd" description="PHP Mess Detector.">
+        <phpmd rulesets="unusedcode">
+            <fileset refid="Services"/>
+            <formatter type="xml" outfile="build/logs/pmd.xml"/>
+        </phpmd>
+    </target>
+    <target name="lint" description="Check syntax">
+        <phplint>
+            <fileset refid="Services"/>
+            <fileset refid="tests"/>
+        </phplint>
+    </target>
+
+    <target name="prepare">
+        <mkdir dir="${builddir}/logs" />
+        <mkdir dir="${builddir}/coverage" />
+    </target>
+
+    <target name="test" description="run unit tests" depends="lint,clean_phpunit">
+        <echo msg='Run unit tests'/>
+        <mkdir dir="tests/coverage" />
+        <coverage-setup database="./coverage.db">
+            <fileset dir="tests" includes="**/*.php"/>
+            <fileset dir="Services" includes="**/*.php"/>
+        </coverage-setup>
+        <phpunit printsummary="yes" codecoverage="yes" pharlocation="/usr/local/bin/phpunit">
+            <formatter type="clover" outfile="${builddir}/logs/clover.xml"/>
+            <formatter type="xml" outfile="${builddir}/logs/junit.xml"/>
+            <formatter type="plain"  usefile="no"/>
+            <batchtest>
+                <fileset refid="tests"/>
+            </batchtest>
+        </phpunit>
+        <coverage-report outfile="coverage.xml">
+            <report todir="tests/coverage" usesorttable="yes" styledir="/usr/share/php/data/phing/etc"/>
+        </coverage-report>
+    </target>
+
+    <target name="clean" depends="clean_phpunit,clean_docs,clean_pmd"/>
+
+    <target name="clean_phpunit" if="coverage_exist">
+        <delete verbose='yes'>
+            <fileset dir="tests/coverage">
+                <include name="**.*" />
+            </fileset>
+        </delete>
+        <delete verbose='no' dir='tests/coverage'/>
+    </target>
+
+    <target name="clean_docs" if="docs_exist">
+        <delete verbose='yes'>
+            <fileset dir="build/docs">
+                <include name="**.*" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="clean_pmd" description="Clean Mess Detector file[s]." if="pmd_exist">
+        <delete verbose="yes">
+            <fileset dir="build">
+            <include name="phpmd.xml"/>
+            </fileset>
+        </delete>
+    </target>
+
+</project>

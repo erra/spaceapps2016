@@ -1,0 +1,26 @@
+HTTP/1.1 200 OK
+
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="OpenStreetMap server">
+  <user display_name="fredflintstone" account_created="2003-09-02T15:27:52Z" id="124">
+    <description>Yabba dabba do!
+
+</description>
+    <contributor-terms agreed="true" pd="true"/>
+    <img href="http://www.openstreetmap.org/user/image/124/me.jpg"/>
+    <roles>
+      <moderator/>
+    </roles>
+    <changesets count="1910"/>
+    <traces count="115"/>
+    <blocks>
+      <received active="0" count="1"/>
+      <issued active="4" count="15"/>
+    </blocks>
+    <home lon="-8.2284600830085" lat="52.222687925572" zoom="3"/>
+    <languages>
+      <lang>en-US</lang>
+      <lang>en</lang>
+    </languages>
+  </user>
+</osm>
