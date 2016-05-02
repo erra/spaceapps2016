@@ -7,7 +7,7 @@
 #include <ESP8266WebServer.h>
 
 const char* ssid = "wifi.modulonet.cl";
-const char* password = "209pelusita124";
+const char* password = "password";
 
 // Create an instance of the server
 // specify the port to listen on as an argument
